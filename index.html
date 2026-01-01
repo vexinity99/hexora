@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>hexora</title>
+<title>New Tab</title>
+<link rel="icon" href="images/ico.ico" type="image/x-icon">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -202,6 +203,9 @@ body {
 </div>
 
 <script>
+    // Minimal URL bar (makes it look cleaner)
+    history.replaceState(null, "", " ");
+
     // Generate hexagons
     const container = document.getElementById('hexContainer');
     function generateHex() {
@@ -233,7 +237,6 @@ body {
         if (!canTry) return;
         const value = passwordInput.value.trim();
         if(value === correctPassword){
-            // Hide password, show main page
             passwordScreen.style.display = "none";
             mainPage.style.display = "block";
         } else {
