@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hexora</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg-color: #0f0f0f;
+    --text-color: #ffffff;
+    --button-bg: #1a1a1a;
+    --button-hover: #2a2a2a;
+    --hex-color: rgba(255,255,255,0.05);
+    --hex-hover: rgba(255,255,255,0.15);
+    --accent-color: #ffffff;
+    --error-color: #ff4d4d;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+body {
+    min-height: 100vh;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Honeycomb background */
+.hex-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 60px);
+    grid-auto-rows: 52px;
+    transform: translateY(-26px);
+    z-index: -1;
+}
+
+.hex-container .hex {
+    width: 60px;
+    height: 52px;
+    background-color: var(--hex-color);
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.hex-container .hex:hover {
+    background-color: var(--hex-hover);
+    transform: scale(1.15);
+}
+
+/* Containers */
+.container {
+    text-align: center;
+    z-index: 1;
+    padding: 2rem;
+    background: rgba(0,0,0,0.4);
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+}
+
+.logo {
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-transform: lowercase;
+    animation: fadeIn 1s ease forwards;
+}
+
+.tagline {
+    font-size: 1.2rem;
+    color: #bdbdbd;
+    margin-bottom: 2rem;
+}
+
+/* Password screen */
+#passwordScreen input[type="password"] {
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 2px solid var(--accent-color);
+    background: var(--button-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    width: 220px;
+    margin-bottom: 1rem;
+    transition: border 0.3s ease;
+}
+
+#passwordScreen input[type="password"]:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+#passwordScreen button {
+    padding: 0.8rem 2rem;
+    border-radius: 12px;
+    border: none;
+    background: var(--button-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+#passwordScreen button:hover {
+    background: var(--button-hover);
+    transform: translateY(-2px);
+}
+
+.error {
+    color: var(--error-color);
+    margin-top: 1rem;
+    min-height: 1.2rem;
+    transition: opacity 0.3s ease;
+}
+
+/* Main page buttons */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.feature-button {
+    background: var(--button-bg);
+    border: 2px solid var(--accent-color);
+    border-radius: 12px;
+    padding: 1.5rem 3rem;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    text-align: center;
+    width: 220px;
+}
+
+.feature-button:hover {
+    background: var(--button-hover);
+    transform: translateY(-3px);
+}
+
+.feature-button h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.4rem;
+    text-transform: lowercase;
+}
+
+.feature-button p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #bdbdbd;
+    text-transform: lowercase;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+    .logo { font-size: 2.5rem; }
+    #passwordScreen input[type="password"], .feature-button { width: 80%; }
+}
+</style>
+</head>
+<body>
+
+<div class="hex-container" id="hexContainer"></div>
+
+<!-- Password screen -->
+<div class="container" id="passwordScreen">
+    <div class="logo">hexora</div>
+    <div class="tagline">enter password to continue</div>
+    <input type="password" id="password" placeholder="password">
+    <br>
+    <button id="submitBtn">enter</button>
+    <div class="error" id="errorMsg"></div>
+</div>
+
+<!-- Main landing page -->
+<div class="container" id="mainPage" style="display:none;">
+    <div class="logo">hexora</div>
+    <div class="tagline">premium gaming experience</div>
+    <div class="button-container">
+        <div class="feature-button" onclick="window.location='games/index.html'">
+            <h3>html games</h3>
+            <p>fun html games</p>
+        </div>
+        <div class="feature-button" onclick="window.location='tools/index.html'">
+            <h3>tools</h3>
+            <p>school tools</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Generate hexagons
+    const container = document.getElementById('hexContainer');
+    function generateHex() {
+        container.innerHTML = '';
+        const cols = Math.ceil(window.innerWidth / 60);
+        const rows = Math.ceil(window.innerHeight / 52) + 2;
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const hex = document.createElement('div');
+                hex.className = 'hex';
+                hex.style.marginTop = (c % 2 === 0 ? '0px' : '26px');
+                container.appendChild(hex);
+            }
+        }
+    }
+    generateHex();
+    window.addEventListener('resize', generateHex);
+
+    // Password logic
+    const correctPassword = "hazel99";
+    const passwordInput = document.getElementById('password');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const passwordScreen = document.getElementById('passwordScreen');
+    const mainPage = document.getElementById('mainPage');
+    let canTry = true;
+
+    submitBtn.addEventListener('click', () => {
+        if (!canTry) return;
+        const value = passwordInput.value.trim();
+        if(value === correctPassword){
+            // Hide password, show main page
+            passwordScreen.style.display = "none";
+            mainPage.style.display = "block";
+        } else {
+            errorMsg.textContent = "wrong password, wait 5 seconds...";
+            canTry = false;
+            setTimeout(() => {
+                canTry = true;
+                errorMsg.textContent = "";
+                passwordInput.value = "";
+                passwordInput.focus();
+            }, 5000);
+        }
+    });
+
+    passwordInput.addEventListener('keydown', (e) => {
+        if(e.key === "Enter") submitBtn.click();
+    });
+
+    passwordInput.focus();
+</script>
+
+</body>
+</html>
