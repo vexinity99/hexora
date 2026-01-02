@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Tab</title>
+<link rel="icon" href="ico.ico" type="image/x-icon">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg-color: #0f0f0f;
+    --text-color: #ffffff;
+    --button-bg: #1a1a1a;
+    --button-hover: #2a2a2a;
+    --hex-color: rgba(255,255,255,0.05);
+    --hex-hover: rgba(255,255,255,0.15);
+    --accent-color: #ffffff;
+    --error-color: #ff4d4d;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+
+body {
+    min-height:100vh;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Hexagon background */
+.hex-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 60px);
+    grid-auto-rows: 52px;
+    transform: translateY(-26px);
+    z-index: -1;
+}
+.hex-container .hex {
+    width: 60px;
+    height: 52px;
+    background-color: var(--hex-color);
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+.hex-container .hex:hover {
+    background-color: var(--hex-hover);
+    transform: scale(1.15);
+}
+
+/* Password screen */
+#passwordScreen {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.8);
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    z-index: 100;
+}
+#passwordScreen input[type="password"] {
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 2px solid var(--accent-color);
+    background: var(--button-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+#passwordScreen input[type="password"]:focus { outline:none; border-color: var(--accent-color);}
+#passwordScreen button {
+    padding: 0.8rem 2rem;
+    border-radius: 12px;
+    border:none;
+    background: var(--button-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+#passwordScreen button:hover {
+    background: var(--button-hover);
+    transform: translateY(-2px);
+}
+#passwordScreen .error {
+    color: var(--error-color);
+    margin-top: 1rem;
+    min-height: 1.2rem;
+}
+
+/* Main container */
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 1rem;
+}
+
+/* Logo */
+.logo {
+    font-size: 3rem;
+    font-weight: 700;
+    text-transform: lowercase;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+/* Search bar */
+#searchBar {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.8rem 1rem;
+    margin: 0 auto 2rem auto;
+    display: block;
+    border-radius: 8px;
+    border: 2px solid var(--accent-color);
+    background: var(--button-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+}
+#searchBar:focus { outline: none; border-color: var(--accent-color); }
+
+/* Game grid */
+.game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Game card */
+.game-card {
+    background: var(--button-bg);
+    border: 2px solid var(--accent-color);
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    position: relative;
+    text-align: center;
+}
+.game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    background: var(--button-hover);
+}
+.game-card h3 { margin: 0.5rem 0; font-size: 1.2rem; text-transform: lowercase; }
+.game-card p { font-size: 0.9rem; color: #bdbdbd; }
+
+/* Play button */
+.play-btn {
+    margin-top: 1rem;
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent-color);
+    color: var(--bg-color);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+.play-btn:hover { background: #ffffffcc; transform: translateY(-2px); }
+
+/* Fullscreen iframe overlay */
+#iframeOverlay {
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: #000;
+    display:none;
+    z-index: 9999;
+}
+#iframeOverlay iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+#closeIframe {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ffffff;
+    color: #000;
+    border: none;
+    padding: 4px 8px;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 10000;
+}
+
+/* Responsive */
+@media(max-width:600px){
+    .game-grid{grid-template-columns:1fr;}
+    #passwordScreen input[type="password"], #passwordScreen button {width:80%;}
+}
+</style>
+</head>
+<body>
+
+<div class="hex-container" id="hexContainer"></div>
+
+<!-- Password screen -->
+<div id="passwordScreen">
+    <div class="logo">hexora tools</div>
+    <input type="password" id="passwordInput" placeholder="password">
+    <button id="passwordSubmit">enter</button>
+    <div class="error" id="passwordError"></div>
+</div>
+
+<div class="container" id="mainContent" style="display:none;">
+    <div class="logo">hexora tools</div>
+    <input type="text" id="searchBar" placeholder="search tools...">
+
+    <div class="game-grid" id="gameGrid">
+        <!-- Example game cards -->
+        <div class="game-card" data-name="GeoFS">
+            <h3>Vera AI</h3>
+            <p>Screen capture AI for studying</p>
+            <button class="play-btn" data-file="VeraAI.html">open</button>
+        </div>
+        <div class="game-card" data-name="game2">
+            <h3>game 2</h3>
+            <p>another html game</p>
+            <button class="play-btn" data-file="game2.html">play</button>
+        </div>
+        <div class="game-card" data-name="game3">
+            <h3>game 3</h3>
+            <p>fun challenges</p>
+            <button class="play-btn" data-file="game3.html">play</button>
+        </div>
+    </div>
+</div>
+
+<!-- Fullscreen iframe overlay -->
+<div id="iframeOverlay">
+    <button id="closeIframe">×</button>
+    <iframe id="gameFrame"></iframe>
+</div>
+
+<script>
+// Minimal URL bar
+history.replaceState(null,""," ");
+
+// Hexagons generation
+const container = document.getElementById('hexContainer');
+function generateHex() {
+    container.innerHTML='';
+    const cols = Math.ceil(window.innerWidth/60);
+    const rows = Math.ceil(window.innerHeight/52)+2;
+    for(let r=0;r<rows;r++){
+        for(let c=0;c<cols;c++){
+            const hex=document.createElement('div');
+            hex.className='hex';
+            hex.style.marginTop=(c%2===0?'0px':'26px');
+            container.appendChild(hex);
+        }
+    }
+}
+generateHex();
+window.addEventListener('resize', generateHex);
+
+// Password logic
+const correctPassword = "hazel99";
+const passwordScreen = document.getElementById('passwordScreen');
+const mainContent = document.getElementById('mainContent');
+const passwordInput = document.getElementById('passwordInput');
+const passwordSubmit = document.getElementById('passwordSubmit');
+const passwordError = document.getElementById('passwordError');
+let canTry = true;
+
+passwordSubmit.addEventListener('click', () => {
+    if(!canTry) return;
+    const value = passwordInput.value.trim();
+    if(value === correctPassword){
+        passwordScreen.style.display = "none";
+        mainContent.style.display = "block";
+    } else {
+        passwordError.textContent = "wrong password, wait 5 seconds...";
+        canTry=false;
+        setTimeout(()=>{ canTry=true; passwordError.textContent=""; passwordInput.value=""; passwordInput.focus(); },5000);
+    }
+});
+
+passwordInput.addEventListener('keydown', (e)=>{if(e.key==="Enter") passwordSubmit.click();});
+
+// Search filter
+const searchBar = document.getElementById('searchBar');
+const gameGrid = document.getElementById('gameGrid');
+searchBar.addEventListener('input', ()=>{
+    const filter = searchBar.value.toLowerCase();
+    const cards = gameGrid.getElementsByClassName('game-card');
+    Array.from(cards).forEach(card=>{
+        const name = card.getAttribute('data-name').toLowerCase();
+        card.style.display = name.includes(filter)?'block':'none';
+    });
+});
+
+// Play button logic
+const overlay = document.getElementById('iframeOverlay');
+const iframe = document.getElementById('gameFrame');
+const closeBtn = document.getElementById('closeIframe');
+
+document.querySelectorAll('.play-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+        const file = btn.getAttribute('data-file');
+        iframe.src = file;
+        overlay.style.display = 'block';
+    });
+});
+
+closeBtn.addEventListener('click', ()=>{
+    overlay.style.display='none';
+    iframe.src='';
+});
+</script>
+
+</body>
+</html>
