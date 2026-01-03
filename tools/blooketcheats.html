@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blooket GUI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --bg-color: #0f0f0f;
+    --text-color: #ffffff;
+    --card-bg: #1a1a1a;
+    --card-hover: #2a2a2a;
+    --hex-color: rgba(255,255,255,0.05);
+    --hex-hover: rgba(255,255,255,0.15);
+    --accent-color: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Hex background */
+.hex-container {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 60px);
+    grid-auto-rows: 52px;
+    transform: translateY(-26px);
+    z-index: -1;
+}
+.hex {
+    width: 60px;
+    height: 52px;
+    background: var(--hex-color);
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    transition: 0.3s ease;
+}
+.hex:hover {
+    background: var(--hex-hover);
+    transform: scale(1.15);
+}
+
+/* Main card */
+.card {
+    background: rgba(26,26,26,0.9);
+    border: 2px solid var(--accent-color);
+    border-radius: 14px;
+    padding: 3rem 4rem;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* Title */
+.logo {
+    font-size: 3rem;
+    font-weight: 700;
+    text-transform: lowercase;
+    margin-bottom: 2rem;
+}
+
+/* Copy button */
+.copy-btn {
+    background: var(--card-bg);
+    border: 2px solid var(--accent-color);
+    color: var(--text-color);
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0.8rem 2.8rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.copy-btn:hover {
+    background: var(--card-hover);
+    transform: translateY(-2px);
+}
+
+/* Status text */
+.status {
+    margin-top: 1.2rem;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.status.show {
+    opacity: 1;
+}
+</style>
+</head>
+<body>
+
+<div class="hex-container" id="hexContainer"></div>
+
+<div class="card">
+    <div class="logo">blooket gui</div>
+    <button class="copy-btn" onclick="fetchAndCopy()">copy</button>
+    <div class="status" id="status">copied to clipboard</div>
+</div>
+
+<script>
+// Generate hex background
+const hexContainer = document.getElementById("hexContainer");
+function generateHex() {
+    hexContainer.innerHTML = "";
+    const cols = Math.ceil(window.innerWidth / 60);
+    const rows = Math.ceil(window.innerHeight / 52) + 2;
+
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            const hex = document.createElement("div");
+            hex.className = "hex";
+            hex.style.marginTop = (c % 2 === 0 ? "0px" : "26px");
+            hexContainer.appendChild(hex);
+        }
+    }
+}
+generateHex();
+window.addEventListener("resize", generateHex);
+
+// Fetch the script from GitLab & copy
+async function fetchAndCopy() {
+    try {
+        const res = await fetch(
+            "https://raw.githubusercontent.com/vexinity99/blooket-hacks/refs/heads/main/hacks"
+        );
+        const text = await res.text();
+
+        await navigator.clipboard.writeText(text);
+
+        const status = document.getElementById("status");
+        status.classList.add("show");
+        setTimeout(() => status.classList.remove("show"), 1500);
+    } catch (err) {
+        alert("Error fetching script!");
+        console.error(err);
+    }
+}
+</script>
+
+</body>
+</html>
